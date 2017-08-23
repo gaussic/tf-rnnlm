@@ -128,15 +128,16 @@ model = PTBModel(config)
 sess = tf.Session()
 sess.run(tf.global_variables_initializer())
 
+print(input_train.batch_len)
+for epoch in range(5):
+    for i in range(input_train.batch_len):
+        x, y = input_train.next_batch()
 
-for epoch in range(1000):
-    x, y = input_train.next_batch()
-
-    feed_dict_train = {model._inputs: x, model._targets: y}
-    sess.run(model.optim, feed_dict=feed_dict_train)
-    error = sess.run(model.errors, feed_dict_train)
-    print(epoch, error)
-
-    pred = sess.run(model._pred, feed_dict={model._inputs: x, model._targets: y})
-    print(sess.run(tf.argmax(pred, 1)))
-    print(np.argmax(y, 1))
+        feed_dict_train = {model._inputs: x, model._targets: y}
+        sess.run(model.optim, feed_dict=feed_dict_train)
+        if i % 500 == 0:
+            error = sess.run(model.errors, feed_dict_train)
+            print(i, error)
+            pred = sess.run(model._pred, feed_dict={model._inputs: x, model._targets: y})
+            print(sess.run(tf.argmax(pred, 1)))
+            print(np.argmax(y, 1))

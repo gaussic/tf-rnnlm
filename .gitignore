@@ -1,1 +1,5 @@
 simple-examples
+ss.txt
+__pycache__
+.DS_Store
+lm.py

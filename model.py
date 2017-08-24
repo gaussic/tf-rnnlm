@@ -22,7 +22,7 @@ class PTBInput(object):
         self.num_steps = num_steps = config.num_steps
         self.vocab_size = config.vocab_size
         self.input_data, self.targets = ptb_producer(data, \
-            batch_size, num_steps)
+            self.vocab_size, batch_size, num_steps)
         self.batch_len = self.input_data.shape[0]
         self.cur_batch = 0
 
@@ -30,13 +30,13 @@ class PTBInput(object):
         x = self.input_data[self.cur_batch]
         y = self.targets[self.cur_batch]
 
-        y_ = np.zeros((y.shape[0], self.vocab_size), dtype=np.bool)
-        for i in range(y.shape[0]):
-            y_[i][y[i]] = 1
+        # y_ = np.zeros((y.shape[0], self.vocab_size), dtype=np.bool)
+        # for i in range(y.shape[0]):
+        #     y_[i][y[i]] = 1
 
         self.cur_batch = (self.cur_batch +1) % self.batch_len
 
-        return x, y_
+        return x, y
 
 
 class PTBModel(object):
@@ -135,7 +135,7 @@ for epoch in range(5):
 
         feed_dict_train = {model._inputs: x, model._targets: y}
         sess.run(model.optim, feed_dict=feed_dict_train)
-        if i % 500 == 0:
+        if i % 50 == 0:
             error = sess.run(model.errors, feed_dict_train)
             print(i, error)
             pred = sess.run(model._pred, feed_dict={model._inputs: x, model._targets: y})

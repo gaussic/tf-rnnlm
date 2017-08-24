@@ -40,7 +40,7 @@ def ptb_raw_data(data_path=None):
 
     return train_data, valid_data, test_data, words, word_to_id
 
-def ptb_producer(raw_data, batch_size=64, num_steps=20, stride=1):
+def ptb_producer(raw_data, vocab_size, batch_size=64, num_steps=20, stride=1):
     data_len = len(raw_data)
 
     sentences = []
@@ -58,15 +58,22 @@ def ptb_producer(raw_data, batch_size=64, num_steps=20, stride=1):
 
     y = np.reshape(next_words[:(batch_len * batch_size)], \
         [batch_len, batch_size])
-    return x, y
+
+    y_ = np.zeros((batch_len, batch_size, vocab_size))
+    for i in range(batch_len):
+        for j in range(batch_size):
+            y_[i][j][y[i][j]] = 1
+    return x, y_
 
 def main():
     train_data, valid_data, test_data, words, word_to_id = \
         ptb_raw_data('simple-examples/data')
 
-    x_train, y_train = ptb_producer(train_data)
+    x_train, y_train = ptb_producer(train_data, len(words))
 
     print(to_words(x_train[100, 3], words))
+
+    print(words[np.argmax(y_train[100, 3])])
 
 if __name__ == '__main__':
     main()

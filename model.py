@@ -30,13 +30,13 @@ class PTBInput(object):
         x = self.input_data[self.cur_batch]
         y = self.targets[self.cur_batch]
 
-        # y_ = np.zeros((y.shape[0], self.vocab_size), dtype=np.bool)
-        # for i in range(y.shape[0]):
-        #     y_[i][y[i]] = 1
+        y_ = np.zeros((y.shape[0], self.vocab_size), dtype=np.bool)
+        for i in range(y.shape[0]):
+            y_[i][y[i]] = 1
 
         self.cur_batch = (self.cur_batch +1) % self.batch_len
 
-        return x, y
+        yield x, y
 
 
 class PTBModel(object):

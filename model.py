@@ -15,6 +15,7 @@ class LMConfig(object):
     num_layers = 2
 
     learning_rate = 0.05
+    dropout = 0.2
 
 class PTBInput(object):
     def __init__(self, config, data):
@@ -50,15 +51,12 @@ class PTBModel(object):
         self.num_layers = config.num_layers
 
         self.learning_rate = config.learning_rate
+        self.dropout = config.dropout
 
         self.init_variables()
-
-        self.lstm()
-
+        self.model()
         self.cost()
-
         self.optimize()
-
         self.error()
 
 
@@ -78,13 +76,21 @@ class PTBModel(object):
         return _inputs
 
 
-    def lstm(self):
+    def model(self):
         def lstm_cell():
-            return tf.contrib.rnn.BasicLSTMCell(self.hidden_dim)
+            cell = tf.contrib.rnn.BasicLSTMCell(self.hidden_dim)
+            return tf.contrib.rnn.DropoutWrapper(cell,
+                output_keep_prob=self.dropout)
+
+        def gru_cell():
+            cell = tf.contrib.rnn.GRUCell(self.hidden_dim)
+            return tf.contrib.rnn.DropoutWrapper(cell,
+                output_keep_prob=self.dropout)
 
         _inputs = self.get_input_embedding()
 
-        cells = [lstm_cell() for _ in range(self.num_layers)]
+        cell = gru_cell()
+        cells = [gru_cell() for _ in range(self.num_layers)]
         cell = tf.contrib.rnn.MultiRNNCell(cells, state_is_tuple=True)
 
         _outputs, state = tf.nn.dynamic_rnn(cell=cell,
@@ -135,9 +141,13 @@ for epoch in range(5):
 
         feed_dict_train = {model._inputs: x, model._targets: y}
         sess.run(model.optim, feed_dict=feed_dict_train)
-        if i % 50 == 0:
-            error = sess.run(model.errors, feed_dict_train)
-            print(i, error)
+        if i % 1000 == 0:
+            cost = sess.run(model.cost, feed_dict_train)
+            print(i, cost)
             pred = sess.run(model._pred, feed_dict={model._inputs: x, model._targets: y})
-            print(sess.run(tf.argmax(pred, 1)))
-            print(np.argmax(y, 1))
+            word_ids = sess.run(tf.argmax(pred, 1))
+            print(' '.join(words[w] for w in word_ids))
+            true_ids = np.argmax(y, 1)
+            print(' '.join(words[w] for w in true_ids))
+
+sess.close()

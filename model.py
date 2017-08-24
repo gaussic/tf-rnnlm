@@ -36,7 +36,7 @@ class PTBInput(object):
 
         self.cur_batch = (self.cur_batch +1) % self.batch_len
 
-        yield x, y
+        return x, y_
 
 
 class PTBModel(object):

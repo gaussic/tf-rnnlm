@@ -15,7 +15,7 @@ class LMConfig(object):
     num_layers = 2
     rnn_model = 'gru'
 
-    learning_rate = 1e-3
+    learning_rate = 0.05
     dropout = 0.2
 
 
@@ -149,8 +149,8 @@ def run_epoch(num_epochs=10):
             if i % 500 == 0:
                 cost = sess.run(model.cost, feed_dict=feed_dict)
 
-                msg = "Epoch: {0:>3}, batch: {1:>6}, Loss: {2:>6.3}"
-                print(msg.format(epoch, i + 1, cost))
+                msg = "Epoch: {0:>3}, batch: {1:>5}, Loss: {2:>6.3}"
+                print(msg.format(epoch + 1, i + 1, cost))
 
                 pred = sess.run(model._pred, feed_dict=feed_dict)
                 word_ids = sess.run(tf.argmax(pred, 1))

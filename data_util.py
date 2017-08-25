@@ -40,7 +40,7 @@ def ptb_raw_data(data_path=None):
 
     return train_data, valid_data, test_data, words, word_to_id
 
-def ptb_producer(raw_data, vocab_size, batch_size=64, num_steps=20, stride=1):
+def ptb_producer(raw_data, batch_size=64, num_steps=20, stride=3):
     data_len = len(raw_data)
 
     sentences = []
@@ -61,11 +61,14 @@ def ptb_producer(raw_data, vocab_size, batch_size=64, num_steps=20, stride=1):
 
     return x, y
 
+
 def main():
     train_data, valid_data, test_data, words, word_to_id = \
         ptb_raw_data('simple-examples/data')
 
-    x_train, y_train = ptb_producer(train_data, len(words))
+    x_train, y_train = ptb_producer(train_data)
+
+    print(x_train.shape)
 
     print(to_words(x_train[100, 3], words))
 
